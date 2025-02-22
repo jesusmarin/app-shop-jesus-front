@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext';
 function CarritoPage() {
   const [carrito, setCarrito] = useState([]);
   const navigate = useNavigate();
+  
   const { user, loading  } = useAuth(); 
 
   useEffect(() => {

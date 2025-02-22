@@ -38,6 +38,7 @@ function Layout({ children }) {
         <h1>Tienda en Línea</h1>
         <nav>
           <Link to="/">Inicio</Link>
+          <Link to="/registro">Registro Usuario</Link>
           <Link to="/perfil">Perfil de Usuario</Link>
           <Link to="/productos">Productos</Link>
           <Link to="/carrito"><span>Carrito: {carritoCantidad}</span></Link>

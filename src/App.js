@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage';
 import CarritoPage from './pages/carritoPage';
 import PerfilPage from './pages/PerfilPage';
 import './App.css';
+import RegisterPage from './pages/RegisterPage';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/carrito" element={<CarritoPage />} />
           <Route path="/perfil" element={<PerfilPage />} />  
+          <Route path="/registro" element={<RegisterPage />} />
           {/* ... otras rutas */}
         </Routes>
       </div>
