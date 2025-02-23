@@ -1,92 +1,91 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useAuth } from '../context/AuthContext'; 
+import productoService from '../services/productoService';
 import Layout from '../components/shared/Layout';
+import ProductoForm from '../components/productos/ProductoForm';
+import ProductoLista from '../components/productos/ProductoLista';
+import { useAuth } from '../context/AuthContext';
 
 function ProductosPage() {
   const [productos, setProductos] = useState([]);
-  const { user, loading  } = useAuth();
-  const [ productosCargando, setProductosCargando] = useState(true);
-  const [carritoEstado, setCarritoEstado] = useState('INACTIVO');
-  const username = localStorage.getItem('username');
-  if (carritoEstado === "INACTIVO") { // agrega condicional
-    setCarritoEstado('ACTIVO');
-  }
+  const [productoSeleccionado, setProductoSeleccionado] = useState(null);
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const { user, loading } = useAuth();
+  const [error, setError] = useState(null);
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
-    axios.get('http://localhost:8080/productos')
-      .then(response => {
-        setProductos(response.data);
-        setProductosCargando(false); // Actualiza el estado de carga local
-      })
-      .catch(error => {
-        console.error('Error al obtener productos:', error);
-        setProductosCargando(false); // Actualiza el estado de carga local en caso de error
-      });
+    cargarProductos();
   }, []);
 
-  const agregarAlCarrito =async (producto) => {
-    if (loading || productosCargando ) { 
-      console.log('Cargando.............');
-      return;
-    }
-    console.error('agregarAlCarrito Usuario no autenticado', user);
-
-    if (!user) {
-      console.error('Usuario no autenticado');
-      return;
-    }
-
-    if (!username) {
-      console.error('Nombre de usuario no encontrado en localStorage');
-      return;
-    }
-
-    const carritoGuardado = JSON.parse(localStorage.getItem('carrito')) || [];
-    const productoExistente = carritoGuardado.find(item => item.producto.id === producto.id);
-
-    if (productoExistente) {
-      productoExistente.cantidad += 1;
-    } else {
-      carritoGuardado.push({ producto, cantidad: 1 });
-    }
-
-    localStorage.setItem('carrito', JSON.stringify(carritoGuardado));
-
-    const itemCarritoDto = {
-      productoId: producto.id,
-      cantidad: 1,
-    };
-
-    let url =`http://localhost:8080/carritos/${username}/productos`;
-    console.log('url', url);
-    console.log('carrito', carritoGuardado);
+  const cargarProductos = async () => {
     try {
-      await axios.post(`http://localhost:8080/carritos/${username}/productos`, itemCarritoDto); // Llama al microservicio
-      console.log('Carrito guardado en el microservicio');
-      setCarritoEstado('ACTIVO');
-      localStorage.setItem('carrito-estado', 'COMPRADO');
+      const data = await productoService.obtenerProductos();
+      setProductos(data);
     } catch (error) {
-      console.error('Error al guardar el carrito en el microservicio:', error);
+      setError('Error al cargar productos');
+      console.error('Error al cargar productos:', error);
     }
-    console.log('Producto agregado al carrito:', producto);
+  };
+
+  const handleNuevoProducto = () => {
+    setProductoSeleccionado(null);
+    setModoEdicion(true);
+  };
+
+  const handleEditarProducto = (producto) => {
+    setProductoSeleccionado(producto);
+    setModoEdicion(true);
+  };
+
+  const handleEliminarProducto = async (id) => {
+    try {
+      await productoService.eliminarProducto(id);
+      cargarProductos();
+    } catch (error) {
+      setError('Error al eliminar producto');
+      console.error('Error al eliminar producto:', error);
+    }
+  };
+
+  const handleGuardarProducto = async (producto) => {
+    try {
+      if (producto.id) {
+        await productoService.actualizarProducto(producto.id, producto);
+      } else {
+        await productoService.crearProducto(producto);
+      }
+      setModoEdicion(false);
+      cargarProductos();
+    } catch (error) {
+      setError('Error al guardar producto');
+      console.error('Error al guardar producto:', error);
+    }
+  };
+
+  const handleCancelarEdicion = () => {
+    setModoEdicion(false);
   };
 
   return (
     <Layout>
       <h2>Lista de productos</h2>
-      <p>Estado del carrito: {carritoEstado}</p>
-      <div className="productos-grid">
-        {productos.map(producto => (          
-          <div key={producto.id} className="producto-item">
-            <img src={producto.urlImagen} alt={producto.nombre} className="producto-imagen" />
-            <h3>{producto.nombre}</h3>
-            <p>{producto.descripcion}</p>
-            <p>Precio: ${producto.precio}</p>
-            <button onClick={() => agregarAlCarrito(producto)}>Agregar al carrito</button>
-          </div>
-        ))}
-      </div>
+      {error && <p className="error-message">{error}</p>}
+      {token && (
+        <button onClick={handleNuevoProducto}>Nuevo producto</button>
+      )}
+      {modoEdicion ? (
+        <ProductoForm
+          productoInicial={productoSeleccionado}
+          onGuardar={handleGuardarProducto}
+          onCancelar={handleCancelarEdicion}
+        />
+      ) : (
+        <ProductoLista
+          productos={productos}
+          onEditar={handleEditarProducto}
+          onEliminar={handleEliminarProducto}
+        />
+      )}
     </Layout>
   );
 }
