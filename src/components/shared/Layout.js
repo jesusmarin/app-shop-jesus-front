@@ -42,6 +42,7 @@ function Layout({ children }) {
           <Link to="/perfil">Perfil de Usuario</Link>
           <Link to="/productos">Productos</Link>
           <Link to="/carrito"><span>Carrito: {carritoCantidad}</span></Link>
+          <Link to="/historial"><span>historial</span></Link>
           {user ? (
             <>
               <Link to="/perfil">Perfil</Link>

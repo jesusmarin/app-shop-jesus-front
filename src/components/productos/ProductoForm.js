@@ -21,7 +21,7 @@ function ProductoForm({ productoInicial, onGuardar, onCancelar }) {
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setProducto((prevProducto) => ({ // Corregido para usar una función de actualización
+    setProducto((prevProducto) => ({ // usar una función de actualización
       ...prevProducto,
       [name]: value,
     }));

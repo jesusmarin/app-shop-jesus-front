@@ -243,3 +243,24 @@ body{
 .perfil-info p {
   margin-bottom: 10px;
 }
+
+/*css para historial page*/
+.historial-lista {
+  list-style: none;
+  padding: 0;
+}
+
+.historial-item {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 10px;
+}
+
+.historial-item p {
+  margin: 5px 0;
+}
+
+.historial-item strong {
+  font-weight: bold;
+}
