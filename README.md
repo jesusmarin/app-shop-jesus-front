@@ -1,3 +1,11 @@
+## Proyecto front end del ejercicio de prueba técnica para Blau Tech
+
+Este proyecto gestiona tres microservicio
+Productos
+Usuarios
+Carrito de compras
+Implementa seguridad JWT
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
